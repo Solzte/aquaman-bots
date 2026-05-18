@@ -1,149 +1,69 @@
-# 🤖 Aquaman Bots - Discord Bot Sistemi
+<div align="center">
 
-Çoklu modül destekli, kapsamlı Discord sunucu yönetim botu.
+# Aquaman Bots
 
-## 📋 Gereksinimler
+**A comprehensive, multi-module Discord server management ecosystem.**
 
-- **Node.js** v18.0.0 veya üzeri
-- **MongoDB** (yerel veya uzak)
-- **Discord Bot Token(ları)**
+</div>
 
-## 🚀 Kurulum
+---
 
-### 1. Bağımlılıkları Yükle
+## Prerequisites
 
-```bash
-npm install
-```
+- **Node.js** >= 18.0.0
+- **MongoDB** (Local or Atlas)
+- **Discord Application Tokens**
 
-### 2. Konfigürasyon
+---
 
-`Global/Settings/System.js` dosyasını düzenleyin:
+## Installation & Setup
 
-```javascript
-module.exports = {
-  // Sunucu bilgileri
-  serverID: "SUNUCU_ID", // Discord sunucu ID'niz
-  serverName: "SUNUCU_ADI", // Sunucu adınız
-  ownerID: ["SAHIP_ID_1", "SAHIP_ID_2"], // Sunucu sahiplerinin ID'leri
-  channelID: "LOG_KANAL_ID", // Log kanalı ID'si
-  database: "mongodb://localhost:27017/VERITABANI_ADI", // MongoDB bağlantı URL'i
+1. **Install Dependencies:**
 
-  // Bot durumu
-  Presence: {
-    Status: "dnd", // online, idle, dnd, invisible
-    Type: ActivityType.Playing, // Playing, Watching, Listening, Streaming
-    Message: ["Durum mesajınız"],
-  },
+        npm install
 
-  // Webhook'lar (opsiyonel)
-  Monitor: [
-    { ID: "System", Webhook: "WEBHOOK_URL" },
-    { ID: "Servers", Webhook: "WEBHOOK_URL" },
-    { ID: "Feedbacks", Webhook: "WEBHOOK_URL" },
-    { ID: "Bugs", Webhook: "WEBHOOK_URL" },
-  ],
+2. **Configuration:**
+   Update the core configuration file located at Global/Settings/System.js with your infrastructure parameters (Guild ID, MongoDB URI, and specific Bot Tokens).
 
-  // Ana botlar
-  Main: {
-    Mainframe: "ANA_BOT_TOKEN", // Ana bot token'ı
-    Elixir: "ELIXIR_BOT_TOKEN", // Elixir bot token'ı
-    Point: "POINT_BOT_TOKEN", // Point bot token'ı
-    Prefix: ["."], // Komut prefix'i
-  },
+3. **Initialize Storage:**
+   For a fresh deployment, clear the existing giveaway state by overwriting Global/Settings/Server/Giveaways.json with an empty array:
 
-  // Hoşgeldin botları
-  Welcome: {
-    Tokens: [
-      "WELCOME_BOT_1_TOKEN",
-      "WELCOME_BOT_2_TOKEN",
-      // ... daha fazla eklenebilir
-    ],
-    Channels: [
-      "HOSGELDIN_KANAL_1_ID",
-      "HOSGELDIN_KANAL_2_ID",
-      // ... daha fazla eklenebilir
-    ],
-  },
+        []
 
-  // Güvenlik botları
-  Security: {
-    Logger: "LOGGER_BOT_TOKEN",
-    Punish: "PUNISH_BOT_TOKEN",
-    Backup: "BACKUP_BOT_TOKEN",
-    Dists: [
-      "DIST_BOT_1_TOKEN",
-      // ... daha fazla eklenebilir
-    ],
-    BotsIDs: [
-      "BOT_1_ID",
-      "BOT_2_ID",
-      // ... tüm bot ID'leri
-    ],
-    Prefix: "!",
-  },
-};
-```
+4. **Launch via PM2:**
 
-### 3. Çekiliş Verilerini Temizle
+        npm install -g pm2
+        pm2 start ecosystem.config.js
 
-Yeni kurulum için `Global/Settings/Server/Giveaways.json` dosyasını temizleyin:
+---
 
-```json
-[]
-```
+## Process Management
 
-### PM2 ile Tüm Botları Başlatma
+| Command                         | Action                  |
+| ------------------------------- | ----------------------- |
+| `pm2 start ecosystem.config.js` | Bootstrap all modules   |
+| `pm2 status`                    | View operational status |
+| `pm2 logs`                      | Stream application logs |
+| `pm2 restart all`               | Restart the ecosystem   |
 
-```bash
-# PM2 kurulumu (ilk seferde)
-npm install -g pm2
+---
 
-# Tüm botları başlat
-pm2 start ecosystem.config.js
+## Module Architecture
 
-# Durumu kontrol et
-pm2 status
+| Module              | Purpose                                       |
+| ------------------- | --------------------------------------------- |
+| **Mainframe** | Core commands and baseline operations.        |
+| **Elixir** | Auxiliary functions and supplementary tools.  |
+| **Point** | Experience (XP) and points progression logic. |
+| **Guardian Logger** | Centralized audit and server event logging.   |
+| **Guardian Punish** | Automated moderation and penalty enforcement. |
+| **Guardian Backup** | State preservation and data backup.           |
+| **Welcomes** | Distributed greeting and onboarding daemon.   |
 
-# Logları görüntüle
-pm2 logs
+---
 
-# Botları durdur
-pm2 stop all
+## Operational Requirements
 
-# Botları yeniden başlat
-pm2 restart all
-```
-
-## 🔧 Bot Modülleri
-
-| Modül               | Açıklama                                   |
-| ------------------- | ------------------------------------------ |
-| **Mainframe**       | Ana bot - tüm komutlar ve temel özellikler |
-| **Elixir**          | Yardımcı bot - ek özellikler               |
-| **Point**           | Puan/XP sistemi                            |
-| **Guardian Logger** | Sunucu log sistemi                         |
-| **Guardian Punish** | Ceza sistemi                               |
-| **Guardian Backup** | Yedekleme sistemi                          |
-| **Welcomes**        | Hoşgeldin mesajları                        |
-
-## 📝 Discord Bot Oluşturma
-
-1. [Discord Developer Portal](https://discord.com/developers/applications)'a gidin
-2. "New Application" butonuna tıklayın
-3. Bot sekmesine gidin ve "Add Bot" tıklayın
-4. "Reset Token" ile token'ı kopyalayın
-5. **Privileged Gateway Intents** bölümünden tüm intent'leri açın:
-   - Presence Intent
-   - Server Members Intent
-   - Message Content Intent
-6. OAuth2 > URL Generator'dan botu sunucuya davet edin:
-   - Scopes: `bot`, `applications.commands`
-   - Permissions: `Administrator`
-
-## ⚠️ Önemli Notlar
-
-- Token'larınızı **asla** paylaşmayın
-- MongoDB'nin çalıştığından emin olun
-- Tüm bot intent'lerinin açık olduğundan emin olun
-- Her bot için ayrı uygulama oluşturmanız gerekir
+- **Gateway Intents:** You must enable Presence, Server Members, and Message Content intents in the Discord Developer Portal for all active bots.
+- **Segregation:** Each module requires its own distinct Discord Application and token.
+- **Security:** Never commit your configuration files containing bot tokens to version control.
